@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,7 +18,7 @@ import { encryptSM4 } from '@/utils/sm4/sm4Core';
 const SM4Visualizer = () => {
   const { toast } = useToast();
   
-  // Configuration state
+  // Configuration state - 修改默认填充模式为PKCS7
   const [config, setConfig] = useState<SM4Config>({
     mode: 'ECB',
     padding: 'PKCS7',
