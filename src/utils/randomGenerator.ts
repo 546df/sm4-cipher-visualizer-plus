@@ -1,39 +1,39 @@
 
 /**
- * Random data generator utilities for SM4 testing
- * Provides functions to generate random keys, plaintexts, and test data
+ * SM4 测试用随机数据生成器
+ * 提供生成随机密钥、明文和测试数据的函数
  */
 
 /**
- * Generate a random hexadecimal key for SM4 (128 bits = 32 hex chars)
- * @returns Random 32-character hexadecimal string
+ * 生成 SM4 的随机十六进制密钥（128 位 = 32 个十六进制字符）
+ * @returns 随机的 32 字符十六进制字符串
  */
 export const generateRandomKey = (): string => {
   const chars = '0123456789abcdef';
   let result = '';
   
-  // Generate 32 random hex characters for 128-bit key
+  // 为 128 位密钥生成 32 个随机十六进制字符
   for (let i = 0; i < 32; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   
-  console.log('Generated random key:', result);
+  console.log('生成的随机密钥:', result);
   return result;
 };
 
 /**
- * Generate random plaintext for testing
- * @param length Desired length of plaintext (default: random between 8-32 chars)
- * @returns Random plaintext string
+ * 生成用于测试的随机明文
+ * @param length 明文的期望长度（默认：8-32 字符之间的随机值）
+ * @returns 随机明文字符串
  */
 export const generateRandomPlaintext = (length?: number): string => {
   const words = [
-    'Hello', 'World', 'SM4', 'Crypto', 'Security', 'Algorithm', 'Encryption',
-    'Decryption', 'Block', 'Cipher', 'Key', 'Data', 'Message', 'Secret',
-    'Digital', 'Privacy', 'Information', 'Technology', 'Computer', 'Network'
+    '你好', '世界', 'SM4', '密码', '安全', '算法', '加密',
+    '解密', '分组', '密码', '密钥', '数据', '消息', '秘密',
+    '数字', '隐私', '信息', '技术', '计算机', '网络'
   ];
   
-  const targetLength = length || Math.floor(Math.random() * 25) + 8; // 8-32 chars
+  const targetLength = length || Math.floor(Math.random() * 25) + 8; // 8-32 字符
   let result = '';
   
   while (result.length < targetLength) {
@@ -47,20 +47,20 @@ export const generateRandomPlaintext = (length?: number): string => {
     }
   }
   
-  // Pad to exact length if needed
+  // 如果需要，填充到确切长度
   if (result.length < targetLength) {
     const remaining = targetLength - result.length;
     result += '!'.repeat(remaining);
   }
   
-  console.log('Generated random plaintext:', result);
+  console.log('生成的随机明文:', result);
   return result;
 };
 
 /**
- * Generate random hexadecimal string of specified length
- * @param length Number of hex characters to generate
- * @returns Random hex string
+ * 生成指定长度的随机十六进制字符串
+ * @param length 要生成的十六进制字符数
+ * @returns 随机十六进制字符串
  */
 export const generateRandomHex = (length: number): string => {
   const chars = '0123456789abcdef';
@@ -74,9 +74,9 @@ export const generateRandomHex = (length: number): string => {
 };
 
 /**
- * Generate random bytes as number array
- * @param count Number of bytes to generate
- * @returns Array of random bytes (0-255)
+ * 生成随机字节作为数字数组
+ * @param count 要生成的字节数
+ * @returns 随机字节数组 (0-255)
  */
 export const generateRandomBytes = (count: number): number[] => {
   const bytes: number[] = [];
@@ -89,9 +89,9 @@ export const generateRandomBytes = (count: number): number[] => {
 };
 
 /**
- * Generate test cases for SM4 algorithm
- * @param count Number of test cases to generate
- * @returns Array of test case objects
+ * 为 SM4 算法生成测试用例
+ * @param count 要生成的测试用例数量
+ * @returns 测试用例对象数组
  */
 export const generateTestCases = (count: number = 5) => {
   const testCases = [];
@@ -99,14 +99,14 @@ export const generateTestCases = (count: number = 5) => {
   for (let i = 0; i < count; i++) {
     testCases.push({
       id: i + 1,
-      name: `Test Case ${i + 1}`,
+      name: `测试用例 ${i + 1}`,
       plaintext: generateRandomPlaintext(),
       key: generateRandomKey(),
-      iv: generateRandomKey(), // For CBC mode
-      description: `Randomly generated test case with ${generateRandomPlaintext().length} character plaintext`
+      iv: generateRandomKey(), // 用于 CBC 模式
+      description: `随机生成的测试用例，明文长度为 ${generateRandomPlaintext().length} 字符`
     });
   }
   
-  console.log('Generated test cases:', testCases);
+  console.log('生成的测试用例:', testCases);
   return testCases;
 };

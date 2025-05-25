@@ -28,7 +28,7 @@ const SM4Visualizer = () => {
   });
 
   // Input state
-  const [plaintext, setPlaintext] = useState('Hello, SM4!');
+  const [plaintext, setPlaintext] = useState('你好，SM4！');
   const [key, setKey] = useState('0123456789abcdef0123456789abcdef');
   const [iv, setIv] = useState('0123456789abcdef0123456789abcdef');
 
@@ -52,8 +52,8 @@ const SM4Visualizer = () => {
       setIv(generateRandomKey()); // IV same length as key
     }
     toast({
-      title: "Random Data Generated",
-      description: "New random key and plaintext have been generated for testing."
+      title: "随机数据已生成",
+      description: "已生成新的随机密钥和明文用于测试。"
     });
   };
 
@@ -64,8 +64,8 @@ const SM4Visualizer = () => {
     setCurrentStep(0);
     setIsProcessing(false);
     toast({
-      title: "Reset Complete",
-      description: "Visualization has been reset to initial state."
+      title: "重置完成",
+      description: "可视化已重置到初始状态。"
     });
   };
 
@@ -73,8 +73,8 @@ const SM4Visualizer = () => {
   const handleEncrypt = async () => {
     if (!plaintext.trim() || !key.trim()) {
       toast({
-        title: "Invalid Input",
-        description: "Please provide both plaintext and key.",
+        title: "输入无效",
+        description: "请提供明文和密钥。",
         variant: "destructive"
       });
       return;
@@ -82,8 +82,8 @@ const SM4Visualizer = () => {
 
     if (key.length !== 32) {
       toast({
-        title: "Invalid Key Length",
-        description: "SM4 key must be exactly 32 hexadecimal characters (128 bits).",
+        title: "密钥长度无效",
+        description: "SM4 密钥必须恰好是 32 个十六进制字符（128 位）。",
         variant: "destructive"
       });
       return;
@@ -91,8 +91,8 @@ const SM4Visualizer = () => {
 
     if (config.mode === 'CBC' && iv.length !== 32) {
       toast({
-        title: "Invalid IV Length",
-        description: "IV must be exactly 32 hexadecimal characters (128 bits) for CBC mode.",
+        title: "初始向量长度无效",
+        description: "CBC 模式的初始向量必须恰好是 32 个十六进制字符（128 位）。",
         variant: "destructive"
       });
       return;
@@ -116,14 +116,14 @@ const SM4Visualizer = () => {
       });
 
       toast({
-        title: "Encryption Complete",
-        description: `SM4 encryption completed in ${executionTime}ms with ${encryptionResult.steps.length} steps.`
+        title: "加密完成",
+        description: `SM4 加密在 ${executionTime}ms 内完成，共 ${encryptionResult.steps.length} 个步骤。`
       });
     } catch (error) {
       console.error('Encryption error:', error);
       toast({
-        title: "Encryption Failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred.",
+        title: "加密失败",
+        description: error instanceof Error ? error.message : "发生了意外错误。",
         variant: "destructive"
       });
     } finally {
@@ -137,7 +137,7 @@ const SM4Visualizer = () => {
       <Card className="border-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>SM4 Algorithm Visualizer</span>
+            <span>SM4 算法可视化工具</span>
             <div className="flex space-x-2">
               <Button
                 variant="secondary"
@@ -146,7 +146,7 @@ const SM4Visualizer = () => {
                 className="flex items-center space-x-2"
               >
                 <Shuffle className="w-4 h-4" />
-                <span>Random</span>
+                <span>随机生成</span>
               </Button>
               <Button
                 variant="secondary"
@@ -155,7 +155,7 @@ const SM4Visualizer = () => {
                 className="flex items-center space-x-2"
               >
                 <RotateCcw className="w-4 h-4" />
-                <span>Reset</span>
+                <span>重置</span>
               </Button>
               <Button
                 variant="secondary"
@@ -165,7 +165,7 @@ const SM4Visualizer = () => {
                 className="flex items-center space-x-2"
               >
                 <Play className="w-4 h-4" />
-                <span>{isProcessing ? 'Processing...' : 'Encrypt'}</span>
+                <span>{isProcessing ? '处理中...' : '加密'}</span>
               </Button>
             </div>
           </CardTitle>
@@ -174,11 +174,11 @@ const SM4Visualizer = () => {
 
       <Tabs defaultValue="configure" className="w-full">
         <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="configure">Configure</TabsTrigger>
-          <TabsTrigger value="input">Input</TabsTrigger>
-          <TabsTrigger value="visualize">Visualize</TabsTrigger>
-          <TabsTrigger value="output">Output</TabsTrigger>
-          <TabsTrigger value="tutorial">Tutorial</TabsTrigger>
+          <TabsTrigger value="configure">配置</TabsTrigger>
+          <TabsTrigger value="input">输入</TabsTrigger>
+          <TabsTrigger value="visualize">可视化</TabsTrigger>
+          <TabsTrigger value="output">输出</TabsTrigger>
+          <TabsTrigger value="tutorial">教程</TabsTrigger>
         </TabsList>
 
         <TabsContent value="configure" className="space-y-4">

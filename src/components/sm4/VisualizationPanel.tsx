@@ -40,8 +40,8 @@ const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
         <CardContent className="flex items-center justify-center h-64">
           <div className="text-center text-gray-500">
             <Eye className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-medium">No encryption process to visualize</p>
-            <p className="text-sm">Configure settings and start encryption to see the step-by-step process</p>
+            <p className="text-lg font-medium">没有加密过程可视化</p>
+            <p className="text-sm">配置设置并开始加密以查看分步过程</p>
           </div>
         </CardContent>
       </Card>
@@ -86,13 +86,13 @@ const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Algorithm Visualization</span>
+            <span>算法可视化</span>
             <div className="flex items-center space-x-2">
               <Badge variant="outline">
-                Round {currentRound.roundNumber + 1} of 32
+                第 {currentRound.roundNumber + 1} 轮，共 32 轮
               </Badge>
               <Badge variant="secondary">
-                {sm4State.mode} Mode
+                {sm4State.mode} 模式
               </Badge>
             </div>
           </CardTitle>
@@ -100,7 +100,7 @@ const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>Encryption Progress</span>
+              <span>加密进度</span>
               <span>{Math.round(progress)}%</span>
             </div>
             <Progress value={progress} className="w-full" />
@@ -144,15 +144,15 @@ const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
             </Button>
 
             <div className="ml-4 flex items-center space-x-2">
-              <label className="text-sm">Speed:</label>
+              <label className="text-sm">速度：</label>
               <select
                 value={playSpeed}
                 onChange={(e) => setPlaySpeed(Number(e.target.value))}
                 className="text-sm border rounded px-2 py-1"
               >
-                <option value={2000}>Slow</option>
-                <option value={1000}>Normal</option>
-                <option value={500}>Fast</option>
+                <option value={2000}>慢</option>
+                <option value={1000}>正常</option>
+                <option value={500}>快</option>
               </select>
             </div>
           </div>
@@ -163,7 +163,7 @@ const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Round {currentRound.roundNumber + 1} Input State</CardTitle>
+            <CardTitle>第 {currentRound.roundNumber + 1} 轮输入状态</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-4 gap-2">
@@ -181,25 +181,25 @@ const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
 
         <Card>
           <CardHeader>
-            <CardTitle>Round Key & Transformation</CardTitle>
+            <CardTitle>轮密钥与变换</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <div className="text-xs text-gray-500 mb-1">Round Key RK{currentRound.roundNumber}</div>
+              <div className="text-xs text-gray-500 mb-1">轮密钥 RK{currentRound.roundNumber}</div>
               <div className="bg-purple-100 p-2 rounded font-mono text-sm">
                 {formatHex(currentRound.roundKey)}
               </div>
             </div>
             
             <div>
-              <div className="text-xs text-gray-500 mb-1">S-box Output</div>
+              <div className="text-xs text-gray-500 mb-1">S 盒输出</div>
               <div className="bg-green-100 p-2 rounded font-mono text-sm">
                 {formatHex(currentRound.sboxOutput)}
               </div>
             </div>
 
             <div>
-              <div className="text-xs text-gray-500 mb-1">Linear Transform Output</div>
+              <div className="text-xs text-gray-500 mb-1">线性变换输出</div>
               <div className="bg-orange-100 p-2 rounded font-mono text-sm">
                 {formatHex(currentRound.linearOutput)}
               </div>
@@ -211,7 +211,7 @@ const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
       {/* Round Output */}
       <Card>
         <CardHeader>
-          <CardTitle>Round {currentRound.roundNumber + 1} Output State</CardTitle>
+          <CardTitle>第 {currentRound.roundNumber + 1} 轮输出状态</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-4 gap-2 mb-4">
@@ -234,29 +234,29 @@ const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
       {/* Algorithm Flow */}
       <Card>
         <CardHeader>
-          <CardTitle>SM4 Algorithm Flow</CardTitle>
+          <CardTitle>SM4 算法流程</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center space-x-4 text-sm">
             <div className="flex items-center space-x-2">
               <div className="w-4 h-4 bg-blue-100 border-2 border-blue-300 rounded"></div>
-              <span>Input</span>
+              <span>输入</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-4 h-4 bg-purple-100 border-2 border-purple-300 rounded"></div>
-              <span>Round Key</span>
+              <span>轮密钥</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-4 h-4 bg-green-100 border-2 border-green-300 rounded"></div>
-              <span>S-box</span>
+              <span>S 盒</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-4 h-4 bg-orange-100 border-2 border-orange-300 rounded"></div>
-              <span>Linear Transform</span>
+              <span>线性变换</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-4 h-4 bg-indigo-100 border-2 border-indigo-300 rounded"></div>
-              <span>Output</span>
+              <span>输出</span>
             </div>
           </div>
         </CardContent>

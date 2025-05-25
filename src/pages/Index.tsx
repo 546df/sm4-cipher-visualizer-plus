@@ -21,9 +21,9 @@ const Index = () => {
               </div>
               <div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  SM4 Cryptography Visualizer
+                  SM4 密码算法可视化工具
                 </h1>
-                <p className="text-sm text-gray-600">Interactive SM4 Algorithm Learning Tool</p>
+                <p className="text-sm text-gray-600">交互式 SM4 算法学习工具</p>
               </div>
             </div>
             
@@ -34,7 +34,7 @@ const Index = () => {
                 className="flex items-center space-x-2"
               >
                 <BookOpen className="w-4 h-4" />
-                <span>Project Info</span>
+                <span>项目介绍</span>
               </Button>
               <Button
                 variant={currentView === 'visualizer' ? 'default' : 'ghost'}
@@ -42,7 +42,7 @@ const Index = () => {
                 className="flex items-center space-x-2"
               >
                 <Key className="w-4 h-4" />
-                <span>Visualizer</span>
+                <span>可视化工具</span>
               </Button>
             </nav>
           </div>
@@ -61,7 +61,7 @@ const Index = () => {
           <div className="text-center text-gray-600">
             <p className="flex items-center justify-center space-x-2">
               <Zap className="w-4 h-4" />
-              <span>SM4 Cryptography Visualizer - Educational Tool for Understanding Encryption</span>
+              <span>SM4 密码算法可视化工具 - 理解加密算法的教育工具</span>
             </p>
           </div>
         </div>

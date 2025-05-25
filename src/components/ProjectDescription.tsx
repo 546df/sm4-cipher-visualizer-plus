@@ -8,23 +8,23 @@ const ProjectDescription = () => {
   const features = [
     {
       icon: <Eye className="w-5 h-5" />,
-      title: "Step-by-Step Visualization",
-      description: "Watch the SM4 algorithm process each step with detailed explanations and visual representations."
+      title: "分步骤可视化",
+      description: "观看 SM4 算法处理每个步骤的详细解释和可视化展示。"
     },
     {
       icon: <Settings className="w-5 h-5" />,
-      title: "Multiple Operation Modes",
-      description: "Support for ECB and CBC modes with configurable padding (None, PKCS7) and formats (Base64, Hex)."
+      title: "多种操作模式",
+      description: "支持 ECB 和 CBC 模式，可配置填充方式（无填充、PKCS7）和格式（Base64、十六进制）。"
     },
     {
       icon: <Zap className="w-5 h-5" />,
-      title: "Random Test Generation",
-      description: "Generate random keys and plaintext for easy testing and experimentation."
+      title: "随机测试生成",
+      description: "生成随机密钥和明文，便于测试和实验。"
     },
     {
       icon: <BookOpen className="w-5 h-5" />,
-      title: "Educational Content",
-      description: "Comprehensive tutorials and examples to help beginners understand cryptography concepts."
+      title: "教育内容",
+      description: "全面的教程和示例，帮助初学者理解密码学概念。"
     }
   ];
 
@@ -42,9 +42,9 @@ const ProjectDescription = () => {
               <Shield className="w-8 h-8" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold mb-2">SM4 Cryptography Visualizer</h1>
+              <h1 className="text-3xl font-bold mb-2">SM4 密码算法可视化工具</h1>
               <p className="text-blue-100 text-lg">
-                Interactive Educational Tool for Understanding SM4 Encryption Algorithm
+                理解 SM4 加密算法的交互式教育工具
               </p>
             </div>
           </div>
@@ -53,21 +53,20 @@ const ProjectDescription = () => {
             <div>
               <h3 className="text-xl font-semibold mb-3 flex items-center">
                 <Key className="w-5 h-5 mr-2" />
-                What is SM4?
+                什么是 SM4？
               </h3>
               <p className="text-blue-50 leading-relaxed">
-                SM4 is a block cipher encryption algorithm adopted as a national standard in China. 
-                It operates on 128-bit blocks with 128-bit keys and uses a 32-round Feistel structure 
-                for secure data encryption and decryption.
+                SM4 是中国采用的分组密码加密算法国家标准。它对 128 位数据块进行操作，
+                使用 128 位密钥和 32 轮 Feistel 结构进行安全的数据加密和解密。
               </p>
             </div>
             <div>
-              <h3 className="text-xl font-semibold mb-3">Key Features</h3>
+              <h3 className="text-xl font-semibold mb-3">主要特性</h3>
               <ul className="text-blue-50 space-y-1">
-                <li>• 128-bit block size and key length</li>
-                <li>• 32-round Feistel network structure</li>
-                <li>• Support for multiple operation modes</li>
-                <li>• Visual step-by-step process display</li>
+                <li>• 128 位分组大小和密钥长度</li>
+                <li>• 32 轮 Feistel 网络结构</li>
+                <li>• 支持多种操作模式</li>
+                <li>• 可视化分步过程显示</li>
               </ul>
             </div>
           </div>
@@ -97,28 +96,28 @@ const ProjectDescription = () => {
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Supported Configurations</CardTitle>
+            <CardTitle>支持的配置</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <h4 className="font-semibold mb-2">Operation Modes</h4>
+              <h4 className="font-semibold mb-2">操作模式</h4>
               <div className="flex space-x-2">
-                <Badge variant="outline">ECB (Electronic Codebook)</Badge>
-                <Badge variant="outline">CBC (Cipher Block Chaining)</Badge>
+                <Badge variant="outline">ECB (电子密码本)</Badge>
+                <Badge variant="outline">CBC (密码块链接)</Badge>
               </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">Padding Modes</h4>
+              <h4 className="font-semibold mb-2">填充模式</h4>
               <div className="flex space-x-2">
-                <Badge variant="outline">None</Badge>
+                <Badge variant="outline">无填充</Badge>
                 <Badge variant="outline">PKCS7</Badge>
               </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">Output Formats</h4>
+              <h4 className="font-semibold mb-2">输出格式</h4>
               <div className="flex space-x-2">
                 <Badge variant="outline">Base64</Badge>
-                <Badge variant="outline">Hex</Badge>
+                <Badge variant="outline">十六进制</Badge>
               </div>
             </div>
           </CardContent>
@@ -126,7 +125,7 @@ const ProjectDescription = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Technologies Used</CardTitle>
+            <CardTitle>使用的技术</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
@@ -137,8 +136,7 @@ const ProjectDescription = () => {
               ))}
             </div>
             <p className="text-gray-600 mt-4 leading-relaxed">
-              Built with modern web technologies to provide a responsive, interactive, 
-              and educational experience for learning cryptographic algorithms.
+              使用现代 Web 技术构建，为学习密码算法提供响应式、交互式和教育性的体验。
             </p>
           </CardContent>
         </Card>
@@ -147,7 +145,7 @@ const ProjectDescription = () => {
       {/* How to Use */}
       <Card>
         <CardHeader>
-          <CardTitle>How to Use This Tool</CardTitle>
+          <CardTitle>如何使用此工具</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-3 gap-6">
@@ -155,27 +153,27 @@ const ProjectDescription = () => {
               <div className="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-600 rounded-full mx-auto mb-3 text-xl font-bold">
                 1
               </div>
-              <h4 className="font-semibold mb-2">Configure Settings</h4>
+              <h4 className="font-semibold mb-2">配置设置</h4>
               <p className="text-gray-600 text-sm">
-                Choose your preferred operation mode, padding, and output format.
+                选择您偏好的操作模式、填充方式和输出格式。
               </p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center w-12 h-12 bg-purple-100 text-purple-600 rounded-full mx-auto mb-3 text-xl font-bold">
                 2
               </div>
-              <h4 className="font-semibold mb-2">Input Data</h4>
+              <h4 className="font-semibold mb-2">输入数据</h4>
               <p className="text-gray-600 text-sm">
-                Enter your plaintext and key, or use the random generation feature.
+                输入您的明文和密钥，或使用随机生成功能。
               </p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full mx-auto mb-3 text-xl font-bold">
                 3
               </div>
-              <h4 className="font-semibold mb-2">Watch & Learn</h4>
+              <h4 className="font-semibold mb-2">观察和学习</h4>
               <p className="text-gray-600 text-sm">
-                Observe the step-by-step encryption process with detailed explanations.
+                观察分步加密过程和详细解释。
               </p>
             </div>
           </div>
