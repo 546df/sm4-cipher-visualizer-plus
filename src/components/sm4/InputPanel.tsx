@@ -40,13 +40,13 @@ const InputPanel: React.FC<InputPanelProps> = ({
       setCopiedField(field);
       setTimeout(() => setCopiedField(null), 2000);
       toast({
-        title: "Copied to clipboard",
-        description: `${field} has been copied to your clipboard.`
+        title: "已复制到剪贴板",
+        description: `${field}已复制到您的剪贴板。`
       });
     } catch (error) {
       toast({
-        title: "Copy failed",
-        description: "Failed to copy to clipboard.",
+        title: "复制失败",
+        description: "无法复制到剪贴板。",
         variant: "destructive"
       });
     }
@@ -54,16 +54,16 @@ const InputPanel: React.FC<InputPanelProps> = ({
 
   const validateKey = (key: string): { isValid: boolean; message: string } => {
     if (!/^[0-9a-fA-F]*$/.test(key)) {
-      return { isValid: false, message: "Key must contain only hexadecimal characters (0-9, a-f)" };
+      return { isValid: false, message: "密钥只能包含十六进制字符（0-9，a-f）" };
     }
     if (key.length !== 32) {
-      return { isValid: false, message: `Key must be exactly 32 characters (current: ${key.length})` };
+      return { isValid: false, message: `密钥必须恰好是32个字符（当前：${key.length}）` };
     }
-    return { isValid: true, message: "Valid 128-bit key" };
+    return { isValid: true, message: "有效的128位密钥" };
   };
 
   const keyValidation = validateKey(keyValue);
-  const ivValidation = config.mode === 'CBC' ? validateKey(iv) : { isValid: true, message: "IV not required for ECB mode" };
+  const ivValidation = config.mode === 'CBC' ? validateKey(iv) : { isValid: true, message: "ECB模式不需要初始向量" };
 
   const getByteLength = (text: string, encoding: 'utf8' | 'ascii'): number => {
     if (encoding === 'ascii') {
@@ -86,35 +86,35 @@ const InputPanel: React.FC<InputPanelProps> = ({
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Type className="w-5 h-5" />
-              <span>Plaintext Input</span>
+              <span>明文输入</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge variant="outline">{plaintextByteLength} bytes</Badge>
+              <Badge variant="outline">{plaintextByteLength} 字节</Badge>
               {config.padding === 'PKCS7' && (
-                <Badge variant="secondary">→ {paddedLength} bytes after padding</Badge>
+                <Badge variant="secondary">→ 填充后 {paddedLength} 字节</Badge>
               )}
             </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="plaintext">Enter text to encrypt</Label>
+            <Label htmlFor="plaintext">输入要加密的文本</Label>
             <Textarea
               id="plaintext"
-              placeholder="Enter your plaintext here..."
+              placeholder="在此输入您的明文..."
               value={plaintext}
               onChange={(e) => onPlaintextChange(e.target.value)}
               className="min-h-[100px] font-mono"
             />
             <div className="flex justify-between items-center text-sm text-gray-600">
-              <span>Encoding: {config.encoding.toUpperCase()}</span>
+              <span>编码方式：{config.encoding.toUpperCase()}</span>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => copyToClipboard(plaintext, 'Plaintext')}
+                onClick={() => copyToClipboard(plaintext, '明文')}
                 className="h-auto p-1"
               >
-                {copiedField === 'Plaintext' ? (
+                {copiedField === '明文' ? (
                   <Check className="w-4 h-4 text-green-600" />
                 ) : (
                   <Copy className="w-4 h-4" />
@@ -132,17 +132,17 @@ const InputPanel: React.FC<InputPanelProps> = ({
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Key className="w-5 h-5" />
-              <span>Encryption Key</span>
+              <span>加密密钥</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="key">128-bit key (32 hex characters)</Label>
+              <Label htmlFor="key">128位密钥（32个十六进制字符）</Label>
               <div className="relative">
                 <Input
                   id="key"
                   type={showKey ? "text" : "password"}
-                  placeholder="Enter 32 hexadecimal characters..."
+                  placeholder="输入32个十六进制字符..."
                   value={keyValue}
                   onChange={(e) => onKeyChange(e.target.value.toLowerCase())}
                   className={`font-mono pr-20 ${!keyValidation.isValid ? 'border-red-500' : 'border-green-500'}`}
@@ -159,10 +159,10 @@ const InputPanel: React.FC<InputPanelProps> = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => copyToClipboard(keyValue, 'Key')}
+                    onClick={() => copyToClipboard(keyValue, '密钥')}
                     className="h-auto p-1"
                   >
-                    {copiedField === 'Key' ? (
+                    {copiedField === '密钥' ? (
                       <Check className="w-4 h-4 text-green-600" />
                     ) : (
                       <Copy className="w-4 h-4" />
@@ -182,19 +182,19 @@ const InputPanel: React.FC<InputPanelProps> = ({
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Key className="w-5 h-5" />
-              <span>Initialization Vector (IV)</span>
+              <span>初始向量（IV）</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="iv">
-                128-bit IV for CBC mode {config.mode !== 'CBC' && '(not required)'}
+                CBC模式的128位初始向量 {config.mode !== 'CBC' && '（不需要）'}
               </Label>
               <div className="relative">
                 <Input
                   id="iv"
                   type={showIv ? "text" : "password"}
-                  placeholder="Enter 32 hexadecimal characters..."
+                  placeholder="输入32个十六进制字符..."
                   value={iv}
                   onChange={(e) => onIvChange(e.target.value.toLowerCase())}
                   disabled={config.mode !== 'CBC'}
@@ -213,11 +213,11 @@ const InputPanel: React.FC<InputPanelProps> = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => copyToClipboard(iv, 'IV')}
+                    onClick={() => copyToClipboard(iv, '初始向量')}
                     disabled={config.mode !== 'CBC'}
                     className="h-auto p-1"
                   >
-                    {copiedField === 'IV' ? (
+                    {copiedField === '初始向量' ? (
                       <Check className="w-4 h-4 text-green-600" />
                     ) : (
                       <Copy className="w-4 h-4" />
@@ -238,17 +238,17 @@ const InputPanel: React.FC<InputPanelProps> = ({
         <CardContent className="pt-6">
           <div className="grid md:grid-cols-3 gap-4 text-sm">
             <div>
-              <span className="font-medium">Input Length:</span>
-              <p className="text-gray-600">{plaintextByteLength} bytes</p>
+              <span className="font-medium">输入长度：</span>
+              <p className="text-gray-600">{plaintextByteLength} 字节</p>
             </div>
             <div>
-              <span className="font-medium">After Padding:</span>
-              <p className="text-gray-600">{paddedLength} bytes ({Math.ceil(paddedLength / 16)} blocks)</p>
+              <span className="font-medium">填充后长度：</span>
+              <p className="text-gray-600">{paddedLength} 字节（{Math.ceil(paddedLength / 16)} 个分组）</p>
             </div>
             <div>
-              <span className="font-medium">Ready to Encrypt:</span>
+              <span className="font-medium">准备加密：</span>
               <p className={keyValidation.isValid && (config.mode !== 'CBC' || ivValidation.isValid) ? 'text-green-600' : 'text-red-600'}>
-                {keyValidation.isValid && (config.mode !== 'CBC' || ivValidation.isValid) ? 'Yes' : 'No'}
+                {keyValidation.isValid && (config.mode !== 'CBC' || ivValidation.isValid) ? '是' : '否'}
               </p>
             </div>
           </div>
