@@ -28,13 +28,13 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
       setCopiedField(field);
       setTimeout(() => setCopiedField(null), 2000);
       toast({
-        title: "Copied to clipboard",
-        description: `${field} has been copied to your clipboard.`
+        title: "已复制到剪贴板",
+        description: `${field}已复制到剪贴板。`
       });
     } catch (error) {
       toast({
-        title: "Copy failed",
-        description: "Failed to copy to clipboard.",
+        title: "复制失败",
+        description: "无法复制到剪贴板。",
         variant: "destructive"
       });
     }
@@ -44,19 +44,19 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
     if (!result) return;
 
     const data = {
-      timestamp: new Date().toISOString(),
-      configuration: config,
-      input: {
-        plaintext: originalText,
-        length: originalText.length
+      时间戳: new Date().toISOString(),
+      配置: config,
+      输入: {
+        明文: originalText,
+        长度: originalText.length
       },
-      output: {
-        ciphertext: result.ciphertext,
-        length: result.ciphertext.length
+      输出: {
+        密文: result.ciphertext,
+        长度: result.ciphertext.length
       },
-      performance: {
-        executionTime: result.executionTime,
-        stepsCount: result.steps.length
+      性能: {
+        执行时间: result.executionTime,
+        步骤数: result.steps.length
       }
     };
 
@@ -64,15 +64,15 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `sm4-encryption-result-${Date.now()}.json`;
+    a.download = `sm4-加密结果-${Date.now()}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
     toast({
-      title: "Download started",
-      description: "Encryption result has been downloaded as JSON file."
+      title: "下载开始",
+      description: "加密结果已下载为 JSON 文件。"
     });
   };
 
@@ -82,8 +82,8 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
         <CardContent className="flex items-center justify-center h-64">
           <div className="text-center text-gray-500">
             <BarChart className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-medium">No encryption result yet</p>
-            <p className="text-sm">Start the encryption process to see the output and analysis</p>
+            <p className="text-lg font-medium">暂无加密结果</p>
+            <p className="text-sm">开始加密过程以查看输出和分析</p>
           </div>
         </CardContent>
       </Card>
@@ -99,15 +99,15 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Encryption Result</span>
+            <span>加密结果</span>
             <div className="flex items-center space-x-2">
               <Badge variant="outline">{config.outputFormat.toUpperCase()}</Badge>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => copyToClipboard(result.ciphertext, 'Ciphertext')}
+                onClick={() => copyToClipboard(result.ciphertext, '密文')}
               >
-                {copiedField === 'Ciphertext' ? (
+                {copiedField === '密文' ? (
                   <Check className="w-4 h-4 text-green-600" />
                 ) : (
                   <Copy className="w-4 h-4" />
@@ -125,7 +125,7 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700">Encrypted Ciphertext</label>
+            <label className="text-sm font-medium text-gray-700">加密后的密文</label>
             <Textarea
               value={result.ciphertext}
               readOnly
@@ -136,16 +136,16 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
           
           <div className="grid md:grid-cols-3 gap-4 text-sm">
             <div>
-              <span className="font-medium">Length:</span>
-              <p className="text-gray-600">{result.ciphertext.length} characters</p>
+              <span className="font-medium">长度：</span>
+              <p className="text-gray-600">{result.ciphertext.length} 字符</p>
             </div>
             <div>
-              <span className="font-medium">Format:</span>
+              <span className="font-medium">格式：</span>
               <p className="text-gray-600">{config.outputFormat.toUpperCase()}</p>
             </div>
             <div>
-              <span className="font-medium">Mode:</span>
-              <p className="text-gray-600">{config.mode} with {config.padding} padding</p>
+              <span className="font-medium">模式：</span>
+              <p className="text-gray-600">{config.mode} 配合 {config.padding} 填充</p>
             </div>
           </div>
         </CardContent>
@@ -155,36 +155,36 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Performance Metrics</CardTitle>
+            <CardTitle>性能指标</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-sm font-medium">Execution Time:</span>
-                <Badge variant="outline">{result.executionTime}ms</Badge>
+                <span className="text-sm font-medium">执行时间：</span>
+                <Badge variant="outline">{result.executionTime}毫秒</Badge>
               </div>
               
               <div className="flex justify-between">
-                <span className="text-sm font-medium">Processing Steps:</span>
+                <span className="text-sm font-medium">处理步骤：</span>
                 <Badge variant="outline">{result.steps.length}</Badge>
               </div>
               
               <div className="flex justify-between">
-                <span className="text-sm font-medium">Throughput:</span>
-                <Badge variant="outline">{throughput.toFixed(1)} bytes/sec</Badge>
+                <span className="text-sm font-medium">吞吐量：</span>
+                <Badge variant="outline">{throughput.toFixed(1)} 字节/秒</Badge>
               </div>
               
               <div className="flex justify-between">
-                <span className="text-sm font-medium">Size Ratio:</span>
+                <span className="text-sm font-medium">大小比率：</span>
                 <Badge variant="outline">{compressionRatio}%</Badge>
               </div>
             </div>
 
             <div className="pt-4 border-t">
               <div className="text-xs text-gray-500 space-y-1">
-                <p>• Higher throughput indicates better performance</p>
-                <p>• Size ratio shows output vs input length</p>
-                <p>• Step count reflects algorithm complexity</p>
+                <p>• 更高的吞吐量表示更好的性能</p>
+                <p>• 大小比率显示输出与输入长度对比</p>
+                <p>• 步骤数反映算法复杂度</p>
               </div>
             </div>
           </CardContent>
@@ -192,36 +192,36 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
 
         <Card>
           <CardHeader>
-            <CardTitle>Security Analysis</CardTitle>
+            <CardTitle>安全性分析</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-sm font-medium">Algorithm:</span>
-                <Badge className="bg-green-600">SM4 (128-bit)</Badge>
+                <span className="text-sm font-medium">算法：</span>
+                <Badge className="bg-green-600">SM4 (128位)</Badge>
               </div>
               
               <div className="flex justify-between">
-                <span className="text-sm font-medium">Key Strength:</span>
-                <Badge className="bg-blue-600">128-bit (2^128)</Badge>
+                <span className="text-sm font-medium">密钥强度：</span>
+                <Badge className="bg-blue-600">128位 (2^128)</Badge>
               </div>
               
               <div className="flex justify-between">
-                <span className="text-sm font-medium">Block Size:</span>
-                <Badge variant="outline">128-bit</Badge>
+                <span className="text-sm font-medium">分组大小：</span>
+                <Badge variant="outline">128位</Badge>
               </div>
               
               <div className="flex justify-between">
-                <span className="text-sm font-medium">Rounds:</span>
+                <span className="text-sm font-medium">轮数：</span>
                 <Badge variant="outline">32</Badge>
               </div>
             </div>
 
             <div className="pt-4 border-t">
               <div className="text-xs text-gray-500 space-y-1">
-                <p>• SM4 is approved by Chinese national standard</p>
-                <p>• 128-bit keys provide strong security</p>
-                <p>• 32 rounds ensure thorough diffusion</p>
+                <p>• SM4 已获中国国家标准认证</p>
+                <p>• 128位密钥提供强安全性</p>
+                <p>• 32轮确保充分扩散</p>
               </div>
             </div>
           </CardContent>
@@ -231,12 +231,12 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
       {/* Input vs Output Comparison */}
       <Card>
         <CardHeader>
-          <CardTitle>Input vs Output Comparison</CardTitle>
+          <CardTitle>输入输出对比</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="text-sm font-medium text-gray-700">Original Plaintext</label>
+              <label className="text-sm font-medium text-gray-700">原始明文</label>
               <Textarea
                 value={originalText}
                 readOnly
@@ -244,14 +244,14 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
                 rows={4}
               />
               <div className="mt-2 flex justify-between text-xs text-gray-500">
-                <span>Length: {originalText.length} characters</span>
+                <span>长度: {originalText.length} 字符</span>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => copyToClipboard(originalText, 'Original plaintext')}
+                  onClick={() => copyToClipboard(originalText, '原始明文')}
                   className="h-auto p-1"
                 >
-                  {copiedField === 'Original plaintext' ? (
+                  {copiedField === '原始明文' ? (
                     <Check className="w-3 h-3 text-green-600" />
                   ) : (
                     <Copy className="w-3 h-3" />
@@ -261,7 +261,7 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
             </div>
             
             <div>
-              <label className="text-sm font-medium text-gray-700">Encrypted Ciphertext</label>
+              <label className="text-sm font-medium text-gray-700">加密后密文</label>
               <Textarea
                 value={result.ciphertext}
                 readOnly
@@ -269,14 +269,14 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
                 rows={4}
               />
               <div className="mt-2 flex justify-between text-xs text-gray-500">
-                <span>Length: {result.ciphertext.length} characters</span>
+                <span>长度: {result.ciphertext.length} 字符</span>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => copyToClipboard(result.ciphertext, 'Encrypted ciphertext')}
+                  onClick={() => copyToClipboard(result.ciphertext, '加密后密文')}
                   className="h-auto p-1"
                 >
-                  {copiedField === 'Encrypted ciphertext' ? (
+                  {copiedField === '加密后密文' ? (
                     <Check className="w-3 h-3 text-green-600" />
                   ) : (
                     <Copy className="w-3 h-3" />

@@ -22,6 +22,7 @@ const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
 }) => {
   const [isAutoPlay, setIsAutoPlay] = React.useState(false);
   const [playSpeed, setPlaySpeed] = React.useState(1000); // ms between steps
+  const [showAllRounds, setShowAllRounds] = React.useState(false);
 
   React.useEffect(() => {
     if (isAutoPlay && sm4State && currentStep < sm4State.rounds.length - 1) {
@@ -155,6 +156,15 @@ const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
                 <option value={500}>快</option>
               </select>
             </div>
+
+            <Button
+              variant={showAllRounds ? "secondary" : "outline"}
+              size="sm"
+              onClick={() => setShowAllRounds(!showAllRounds)}
+              className="ml-4"
+            >
+              {showAllRounds ? "隐藏" : "显示"}全部轮
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -230,6 +240,50 @@ const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
           </div>
         </CardContent>
       </Card>
+
+      {/* All Rounds Overview */}
+      {showAllRounds && (
+        <Card>
+          <CardHeader>
+            <CardTitle>完整加密过程概览</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4 max-h-96 overflow-y-auto">
+              {sm4State.rounds.map((round, index) => (
+                <div 
+                  key={index}
+                  className={`border rounded p-3 cursor-pointer transition-colors ${
+                    index === currentStep ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'
+                  }`}
+                  onClick={() => onStepChange(index)}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium">第 {round.roundNumber + 1} 轮</h4>
+                    <Badge variant={index === currentStep ? "default" : "outline"}>
+                      RK{round.roundNumber}: {formatHex(round.roundKey)}
+                    </Badge>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-xs">
+                    <div>
+                      <span className="text-gray-500">输入：</span>
+                      <div className="font-mono">
+                        {round.input.map(w => formatHex(w)).join(' | ')}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">输出：</span>
+                      <div className="font-mono">
+                        {round.output.map(w => formatHex(w)).join(' | ')}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Algorithm Flow */}
       <Card>
