@@ -6,28 +6,34 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Type, Key, Eye, EyeOff, Copy, Check } from 'lucide-react';
+import { Type, Key, Eye, EyeOff, Copy, Check, Lock, Unlock } from 'lucide-react';
 import { SM4Config } from '@/types/sm4';
 import { useToast } from '@/hooks/use-toast';
 
 interface InputPanelProps {
   plaintext: string;
   onPlaintextChange: (value: string) => void;
+  ciphertext: string;
+  onCiphertextChange: (value: string) => void;
   keyValue: string;
   onKeyChange: (value: string) => void;
   iv: string;
   onIvChange: (value: string) => void;
   config: SM4Config;
+  operationMode: 'encrypt' | 'decrypt';
 }
 
 const InputPanel: React.FC<InputPanelProps> = ({
   plaintext,
   onPlaintextChange,
+  ciphertext,
+  onCiphertextChange,
   keyValue,
   onKeyChange,
   iv,
   onIvChange,
-  config
+  config,
+  operationMode
 }) => {
   const { toast } = useToast();
   const [showKey, setShowKey] = React.useState(false);
@@ -69,28 +75,30 @@ const InputPanel: React.FC<InputPanelProps> = ({
     if (encoding === 'ascii') {
       return text.length;
     }
-    // Rough UTF-8 byte count estimation
     return new Blob([text]).size;
   };
 
-  const plaintextByteLength = getByteLength(plaintext, config.encoding);
-  const paddedLength = config.padding === 'PKCS7' 
-    ? plaintextByteLength + (16 - (plaintextByteLength % 16))
-    : plaintextByteLength;
+  const currentText = operationMode === 'encrypt' ? plaintext : ciphertext;
+  const textByteLength = operationMode === 'encrypt' ? getByteLength(plaintext, config.encoding) : ciphertext.length / 2;
+  const paddedLength = operationMode === 'encrypt' && config.padding === 'PKCS7' 
+    ? textByteLength + (16 - (textByteLength % 16))
+    : textByteLength;
 
   return (
     <div className="space-y-6">
-      {/* Plaintext Input */}
+      {/* Text Input */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Type className="w-5 h-5" />
-              <span>明文输入</span>
+              {operationMode === 'encrypt' ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+              <span>{operationMode === 'encrypt' ? '明文输入' : '密文输入'}</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge variant="outline">{plaintextByteLength} 字节</Badge>
-              {config.padding === 'PKCS7' && (
+              <Badge variant="outline">
+                {operationMode === 'encrypt' ? `${textByteLength} 字节` : `${Math.floor(textByteLength)} 字节`}
+              </Badge>
+              {operationMode === 'encrypt' && config.padding === 'PKCS7' && (
                 <Badge variant="secondary">→ 填充后 {paddedLength} 字节</Badge>
               )}
             </div>
@@ -98,23 +106,30 @@ const InputPanel: React.FC<InputPanelProps> = ({
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="plaintext">输入要加密的文本</Label>
+            <Label htmlFor="text">
+              {operationMode === 'encrypt' ? '输入要加密的文本' : '输入要解密的密文'}
+            </Label>
             <Textarea
-              id="plaintext"
-              placeholder="在此输入您的明文..."
-              value={plaintext}
-              onChange={(e) => onPlaintextChange(e.target.value)}
+              id="text"
+              placeholder={operationMode === 'encrypt' ? '在此输入您的明文...' : '在此输入十六进制或Base64格式的密文...'}
+              value={currentText}
+              onChange={(e) => operationMode === 'encrypt' ? onPlaintextChange(e.target.value) : onCiphertextChange(e.target.value)}
               className="min-h-[100px] font-mono"
             />
             <div className="flex justify-between items-center text-sm text-gray-600">
-              <span>编码方式：{config.encoding.toUpperCase()}</span>
+              <span>
+                {operationMode === 'encrypt' 
+                  ? `编码方式：${config.encoding.toUpperCase()}`
+                  : `格式：${config.outputFormat.toUpperCase()}`
+                }
+              </span>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => copyToClipboard(plaintext, '明文')}
+                onClick={() => copyToClipboard(currentText, operationMode === 'encrypt' ? '明文' : '密文')}
                 className="h-auto p-1"
               >
-                {copiedField === '明文' ? (
+                {copiedField === (operationMode === 'encrypt' ? '明文' : '密文') ? (
                   <Check className="w-4 h-4 text-green-600" />
                 ) : (
                   <Copy className="w-4 h-4" />
@@ -239,14 +254,23 @@ const InputPanel: React.FC<InputPanelProps> = ({
           <div className="grid md:grid-cols-3 gap-4 text-sm">
             <div>
               <span className="font-medium">输入长度：</span>
-              <p className="text-gray-600">{plaintextByteLength} 字节</p>
+              <p className="text-gray-600">
+                {operationMode === 'encrypt' ? `${textByteLength} 字节` : `${Math.floor(textByteLength)} 字节`}
+              </p>
             </div>
             <div>
-              <span className="font-medium">填充后长度：</span>
-              <p className="text-gray-600">{paddedLength} 字节（{Math.ceil(paddedLength / 16)} 个分组）</p>
+              <span className="font-medium">
+                {operationMode === 'encrypt' ? '填充后长度：' : '预期长度：'}
+              </span>
+              <p className="text-gray-600">
+                {operationMode === 'encrypt' 
+                  ? `${paddedLength} 字节（${Math.ceil(paddedLength / 16)} 个分组）`
+                  : `${Math.floor(textByteLength)} 字节（${Math.ceil(textByteLength / 16)} 个分组）`
+                }
+              </p>
             </div>
             <div>
-              <span className="font-medium">准备加密：</span>
+              <span className="font-medium">准备{operationMode === 'encrypt' ? '加密' : '解密'}：</span>
               <p className={keyValidation.isValid && (config.mode !== 'CBC' || ivValidation.isValid) ? 'text-green-600' : 'text-red-600'}>
                 {keyValidation.isValid && (config.mode !== 'CBC' || ivValidation.isValid) ? '是' : '否'}
               </p>

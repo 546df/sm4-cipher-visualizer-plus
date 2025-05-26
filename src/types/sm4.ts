@@ -1,4 +1,3 @@
-
 /**
  * SM4 algorithm type definitions
  * Defines interfaces and types for SM4 encryption/decryption operations
@@ -50,10 +49,18 @@ export interface BlockResult {
   rounds: SM4RoundState[];
 }
 
-// Complete encryption result
+// SM4 encryption result interface
 export interface EncryptionResult {
   ciphertext: string;
   state: SM4State;
   steps: SM4Step[];
-  blocks: BlockResult[];
+  blocks: any[];
+}
+
+// SM4 decryption result interface
+export interface DecryptionResult {
+  plaintext: string;
+  state: SM4State;
+  steps: SM4Step[];
+  blocks: any[];
 }

@@ -4,21 +4,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Copy, Check, Download, BarChart } from 'lucide-react';
+import { Copy, Check, Download, BarChart, Lock, Unlock } from 'lucide-react';
 import { SM4Config } from '@/types/sm4';
 import { useToast } from '@/hooks/use-toast';
 
 interface OutputPanelProps {
   result: {
-    ciphertext: string;
+    output: string;
     steps: any[];
     executionTime: number;
   } | null;
   config: SM4Config;
   originalText: string;
+  operationMode: 'encrypt' | 'decrypt';
 }
 
-const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText }) => {
+const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText, operationMode }) => {
   const { toast } = useToast();
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
 
@@ -45,14 +46,15 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
 
     const data = {
       时间戳: new Date().toISOString(),
+      操作模式: operationMode === 'encrypt' ? '加密' : '解密',
       配置: config,
       输入: {
-        明文: originalText,
+        [operationMode === 'encrypt' ? '明文' : '密文']: originalText,
         长度: originalText.length
       },
       输出: {
-        密文: result.ciphertext,
-        长度: result.ciphertext.length
+        [operationMode === 'encrypt' ? '密文' : '明文']: result.output,
+        长度: result.output.length
       },
       性能: {
         执行时间: result.executionTime,
@@ -64,7 +66,7 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `sm4-加密结果-${Date.now()}.json`;
+    a.download = `sm4-${operationMode === 'encrypt' ? '加密' : '解密'}结果-${Date.now()}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -72,7 +74,7 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
 
     toast({
       title: "下载开始",
-      description: "加密结果已下载为 JSON 文件。"
+      description: `${operationMode === 'encrypt' ? '加密' : '解密'}结果已下载为 JSON 文件。`
     });
   };
 
@@ -82,32 +84,35 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
         <CardContent className="flex items-center justify-center h-64">
           <div className="text-center text-gray-500">
             <BarChart className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-medium">暂无加密结果</p>
-            <p className="text-sm">开始加密过程以查看输出和分析</p>
+            <p className="text-lg font-medium">暂无{operationMode === 'encrypt' ? '加密' : '解密'}结果</p>
+            <p className="text-sm">开始{operationMode === 'encrypt' ? '加密' : '解密'}过程以查看输出和分析</p>
           </div>
         </CardContent>
       </Card>
     );
   }
 
-  const compressionRatio = ((result.ciphertext.length / originalText.length) * 100).toFixed(1);
-  const throughput = originalText.length / (result.executionTime / 1000); // bytes per second
+  const compressionRatio = ((result.output.length / originalText.length) * 100).toFixed(1);
+  const throughput = originalText.length / (result.executionTime / 1000);
 
   return (
     <div className="space-y-6">
-      {/* Encryption Result */}
+      {/* Result */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>加密结果</span>
             <div className="flex items-center space-x-2">
-              <Badge variant="outline">{config.outputFormat.toUpperCase()}</Badge>
+              {operationMode === 'encrypt' ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+              <span>{operationMode === 'encrypt' ? '加密' : '解密'}结果</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              {operationMode === 'encrypt' && <Badge variant="outline">{config.outputFormat.toUpperCase()}</Badge>}
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => copyToClipboard(result.ciphertext, '密文')}
+                onClick={() => copyToClipboard(result.output, operationMode === 'encrypt' ? '密文' : '明文')}
               >
-                {copiedField === '密文' ? (
+                {copiedField === (operationMode === 'encrypt' ? '密文' : '明文') ? (
                   <Check className="w-4 h-4 text-green-600" />
                 ) : (
                   <Copy className="w-4 h-4" />
@@ -125,9 +130,11 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700">加密后的密文</label>
+            <label className="text-sm font-medium text-gray-700">
+              {operationMode === 'encrypt' ? '加密后的密文' : '解密后的明文'}
+            </label>
             <Textarea
-              value={result.ciphertext}
+              value={result.output}
               readOnly
               className="mt-1 font-mono text-sm bg-gray-50"
               rows={6}
@@ -137,11 +144,13 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
           <div className="grid md:grid-cols-3 gap-4 text-sm">
             <div>
               <span className="font-medium">长度：</span>
-              <p className="text-gray-600">{result.ciphertext.length} 字符</p>
+              <p className="text-gray-600">{result.output.length} 字符</p>
             </div>
             <div>
               <span className="font-medium">格式：</span>
-              <p className="text-gray-600">{config.outputFormat.toUpperCase()}</p>
+              <p className="text-gray-600">
+                {operationMode === 'encrypt' ? config.outputFormat.toUpperCase() : config.encoding.toUpperCase()}
+              </p>
             </div>
             <div>
               <span className="font-medium">模式：</span>
@@ -236,7 +245,9 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
         <CardContent>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="text-sm font-medium text-gray-700">原始明文</label>
+              <label className="text-sm font-medium text-gray-700">
+                {operationMode === 'encrypt' ? '原始明文' : '原始密文'}
+              </label>
               <Textarea
                 value={originalText}
                 readOnly
@@ -248,10 +259,10 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => copyToClipboard(originalText, '原始明文')}
+                  onClick={() => copyToClipboard(originalText, operationMode === 'encrypt' ? '原始明文' : '原始密文')}
                   className="h-auto p-1"
                 >
-                  {copiedField === '原始明文' ? (
+                  {copiedField === (operationMode === 'encrypt' ? '原始明文' : '原始密文') ? (
                     <Check className="w-3 h-3 text-green-600" />
                   ) : (
                     <Copy className="w-3 h-3" />
@@ -261,22 +272,24 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ result, config, originalText 
             </div>
             
             <div>
-              <label className="text-sm font-medium text-gray-700">加密后密文</label>
+              <label className="text-sm font-medium text-gray-700">
+                {operationMode === 'encrypt' ? '加密后密文' : '解密后明文'}
+              </label>
               <Textarea
-                value={result.ciphertext}
+                value={result.output}
                 readOnly
                 className="mt-1 font-mono text-sm bg-purple-50"
                 rows={4}
               />
               <div className="mt-2 flex justify-between text-xs text-gray-500">
-                <span>长度: {result.ciphertext.length} 字符</span>
+                <span>长度: {result.output.length} 字符</span>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => copyToClipboard(result.ciphertext, '加密后密文')}
+                  onClick={() => copyToClipboard(result.output, operationMode === 'encrypt' ? '加密后密文' : '解密后明文')}
                   className="h-auto p-1"
                 >
-                  {copiedField === '加密后密文' ? (
+                  {copiedField === (operationMode === 'encrypt' ? '加密后密文' : '解密后明文') ? (
                     <Check className="w-3 h-3 text-green-600" />
                   ) : (
                     <Copy className="w-3 h-3" />

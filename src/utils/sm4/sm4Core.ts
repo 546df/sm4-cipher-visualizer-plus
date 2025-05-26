@@ -1,4 +1,3 @@
-
 /**
  * Core SM4 encryption algorithm implementation
  * Implements the complete SM4 block cipher with step-by-step visualization
@@ -139,7 +138,7 @@ export const encryptSM4 = async (
  * @param key 128-bit master key as byte array
  * @returns Array of 32 round keys
  */
-const generateRoundKeys = (key: number[]): number[] => {
+export const generateRoundKeys = (key: number[]): number[] => {
   console.log('Generating round keys from master key...');
   
   // Convert key to words
@@ -211,7 +210,7 @@ const keyTransformation = (input: number): number => {
  * @param blockIndex Block index for identification
  * @returns Block encryption result with round details
  */
-const encryptBlock = (block: number[], roundKeys: number[], blockIndex: number) => {
+export const encryptBlock = (block: number[], roundKeys: number[], blockIndex: number) => {
   console.log(`Encrypting block ${blockIndex}:`, bytesToHex(block));
   
   // Convert block to 4 32-bit words

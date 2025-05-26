@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Play, RotateCcw, Shuffle } from 'lucide-react';
+import { Play, RotateCcw, Shuffle, Lock, Unlock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 import ConfigurationPanel from '@/components/sm4/ConfigurationPanel';
@@ -14,6 +15,7 @@ import TutorialPanel from '@/components/sm4/TutorialPanel';
 import { SM4Config, SM4State } from '@/types/sm4';
 import { generateRandomKey, generateRandomPlaintext } from '@/utils/randomGenerator';
 import { encryptSM4 } from '@/utils/sm4/sm4Core';
+import { decryptSM4 } from '@/utils/sm4/sm4Decrypt';
 
 const SM4Visualizer = () => {
   const { toast } = useToast();
@@ -28,8 +30,12 @@ const SM4Visualizer = () => {
 
   // Input state
   const [plaintext, setPlaintext] = useState('你好，SM4！');
+  const [ciphertext, setCiphertext] = useState('');
   const [key, setKey] = useState('0123456789abcdef0123456789abcdef');
   const [iv, setIv] = useState('0123456789abcdef0123456789abcdef');
+
+  // Operation mode state
+  const [operationMode, setOperationMode] = useState<'encrypt' | 'decrypt'>('encrypt');
 
   // Visualization state
   const [sm4State, setSm4State] = useState<SM4State | null>(null);
@@ -38,7 +44,7 @@ const SM4Visualizer = () => {
 
   // Output state
   const [result, setResult] = useState<{
-    ciphertext: string;
+    output: string;
     steps: any[];
     executionTime: number;
   } | null>(null);
@@ -46,13 +52,15 @@ const SM4Visualizer = () => {
   // Generate random test data
   const handleGenerateRandom = () => {
     setKey(generateRandomKey());
-    setPlaintext(generateRandomPlaintext());
+    if (operationMode === 'encrypt') {
+      setPlaintext(generateRandomPlaintext());
+    }
     if (config.mode === 'CBC') {
-      setIv(generateRandomKey()); // IV same length as key
+      setIv(generateRandomKey());
     }
     toast({
       title: "随机数据已生成",
-      description: "已生成新的随机密钥和明文用于测试。"
+      description: `已生成新的随机密钥${operationMode === 'encrypt' ? '和明文' : ''}用于测试。`
     });
   };
 
@@ -68,12 +76,14 @@ const SM4Visualizer = () => {
     });
   };
 
-  // Start encryption process
-  const handleEncrypt = async () => {
-    if (!plaintext.trim() || !key.trim()) {
+  // Start encryption/decryption process
+  const handleProcess = async () => {
+    const inputText = operationMode === 'encrypt' ? plaintext : ciphertext;
+    
+    if (!inputText.trim() || !key.trim()) {
       toast({
         title: "输入无效",
-        description: "请提供明文和密钥。",
+        description: `请提供${operationMode === 'encrypt' ? '明文' : '密文'}和密钥。`,
         variant: "destructive"
       });
       return;
@@ -103,25 +113,32 @@ const SM4Visualizer = () => {
     try {
       const startTime = Date.now();
       
-      const encryptionResult = await encryptSM4(plaintext, key, config, iv);
+      let processResult;
+      if (operationMode === 'encrypt') {
+        processResult = await encryptSM4(plaintext, key, config, iv);
+        setCiphertext(processResult.ciphertext);
+      } else {
+        processResult = await decryptSM4(ciphertext, key, config, iv);
+        setPlaintext(processResult.plaintext);
+      }
       
       const executionTime = Date.now() - startTime;
       
-      setSm4State(encryptionResult.state);
+      setSm4State(processResult.state);
       setResult({
-        ciphertext: encryptionResult.ciphertext,
-        steps: encryptionResult.steps,
+        output: operationMode === 'encrypt' ? processResult.ciphertext : processResult.plaintext,
+        steps: processResult.steps,
         executionTime
       });
 
       toast({
-        title: "加密完成",
-        description: `SM4 加密在 ${executionTime}ms 内完成，共 ${encryptionResult.steps.length} 个步骤。`
+        title: `${operationMode === 'encrypt' ? '加密' : '解密'}完成`,
+        description: `SM4 ${operationMode === 'encrypt' ? '加密' : '解密'}在 ${executionTime}ms 内完成，共 ${processResult.steps.length} 个步骤。`
       });
     } catch (error) {
-      console.error('Encryption error:', error);
+      console.error(`${operationMode === 'encrypt' ? 'Encryption' : 'Decryption'} error:`, error);
       toast({
-        title: "加密失败",
+        title: `${operationMode === 'encrypt' ? '加密' : '解密'}失败`,
         description: error instanceof Error ? error.message : "发生了意外错误。",
         variant: "destructive"
       });
@@ -138,6 +155,26 @@ const SM4Visualizer = () => {
           <CardTitle className="flex items-center justify-between">
             <span>SM4 算法可视化工具</span>
             <div className="flex space-x-2">
+              <div className="flex bg-white/20 rounded-lg p-1">
+                <Button
+                  variant={operationMode === 'encrypt' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setOperationMode('encrypt')}
+                  className={`flex items-center space-x-1 ${operationMode === 'encrypt' ? '' : 'text-white hover:bg-white/20'}`}
+                >
+                  <Lock className="w-4 h-4" />
+                  <span>加密</span>
+                </Button>
+                <Button
+                  variant={operationMode === 'decrypt' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setOperationMode('decrypt')}
+                  className={`flex items-center space-x-1 ${operationMode === 'decrypt' ? '' : 'text-white hover:bg-white/20'}`}
+                >
+                  <Unlock className="w-4 h-4" />
+                  <span>解密</span>
+                </Button>
+              </div>
               <Button
                 variant="secondary"
                 size="sm"
@@ -159,12 +196,12 @@ const SM4Visualizer = () => {
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={handleEncrypt}
+                onClick={handleProcess}
                 disabled={isProcessing}
                 className="flex items-center space-x-2"
               >
                 <Play className="w-4 h-4" />
-                <span>{isProcessing ? '处理中...' : '加密'}</span>
+                <span>{isProcessing ? '处理中...' : (operationMode === 'encrypt' ? '加密' : '解密')}</span>
               </Button>
             </div>
           </CardTitle>
@@ -188,11 +225,14 @@ const SM4Visualizer = () => {
           <InputPanel
             plaintext={plaintext}
             onPlaintextChange={setPlaintext}
+            ciphertext={ciphertext}
+            onCiphertextChange={setCiphertext}
             keyValue={key}
             onKeyChange={setKey}
             iv={iv}
             onIvChange={setIv}
             config={config}
+            operationMode={operationMode}
           />
         </TabsContent>
 
@@ -209,7 +249,8 @@ const SM4Visualizer = () => {
           <OutputPanel
             result={result}
             config={config}
-            originalText={plaintext}
+            originalText={operationMode === 'encrypt' ? plaintext : ciphertext}
+            operationMode={operationMode}
           />
         </TabsContent>
 
