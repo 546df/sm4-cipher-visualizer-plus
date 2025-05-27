@@ -1,4 +1,3 @@
-
 /**
  * Main application logic for SM4 Cipher Visualizer
  */
@@ -13,6 +12,8 @@ let currentConfig = {
 
 let currentOperation = 'encrypt';
 let processingResults = null;
+let currentVisualizationStep = 0;
+let isAutoPlay = false;
 
 // DOM Elements
 const elements = {
@@ -45,7 +46,14 @@ const elements = {
     blockCount: document.getElementById('block-count'),
     
     // Visualization
-    stepsContainer: document.getElementById('steps-container')
+    stepsContainer: document.getElementById('steps-container'),
+    visualizationControls: document.getElementById('visualization-controls'),
+    stepInfo: document.getElementById('step-info'),
+    stepProgress: document.getElementById('step-progress'),
+    prevStepBtn: document.getElementById('prev-step'),
+    nextStepBtn: document.getElementById('next-step'),
+    autoPlayBtn: document.getElementById('auto-play'),
+    resetVisualizationBtn: document.getElementById('reset-visualization')
 };
 
 // Initialize application
@@ -54,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     updateUIForOperation();
     setDefaultValues();
+    setupVisualizationControls();
 });
 
 // Event listeners setup
@@ -85,6 +94,22 @@ function setupEventListeners() {
     elements.inputText.addEventListener('input', updateProcessButton);
     elements.keyInput.addEventListener('input', updateProcessButton);
     elements.ivInput.addEventListener('input', updateProcessButton);
+}
+
+// Setup visualization controls
+function setupVisualizationControls() {
+    if (elements.prevStepBtn) {
+        elements.prevStepBtn.addEventListener('click', previousStep);
+    }
+    if (elements.nextStepBtn) {
+        elements.nextStepBtn.addEventListener('click', nextStep);
+    }
+    if (elements.autoPlayBtn) {
+        elements.autoPlayBtn.addEventListener('click', toggleAutoPlay);
+    }
+    if (elements.resetVisualizationBtn) {
+        elements.resetVisualizationBtn.addEventListener('click', resetVisualization);
+    }
 }
 
 // Navigation
@@ -277,60 +302,218 @@ function displayResults(result, executionTime) {
 
 function displayVisualization(result) {
     const container = elements.stepsContainer;
+    if (!container) return;
+    
     container.innerHTML = '';
     
-    if (result.steps && result.steps.length > 0) {
-        result.steps.forEach(step => {
-            const stepElement = createStepElement(step);
-            container.appendChild(stepElement);
-        });
+    if (result.state && result.state.rounds && result.state.rounds.length > 0) {
+        createVisualizationInterface(result.state);
+        updateVisualizationStep(0);
     } else {
         container.innerHTML = '<p class="placeholder">暂无可视化数据</p>';
     }
 }
 
-function createStepElement(step) {
-    const stepDiv = document.createElement('div');
-    stepDiv.className = 'step-item';
+function createVisualizationInterface(state) {
+    const container = elements.stepsContainer;
     
-    stepDiv.innerHTML = `
-        <div class="step-header">
-            <div class="step-number">${step.id}</div>
-            <div class="step-title">${step.title}</div>
+    // Create visualization header
+    const header = document.createElement('div');
+    header.className = 'visualization-header';
+    header.innerHTML = `
+        <h3>SM4 算法可视化 - ${state.mode} 模式</h3>
+        <div class="progress-info">
+            <span>总共 ${state.rounds.length} 轮</span>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
         </div>
-        <div class="step-description">${step.description}</div>
-        ${step.data ? createStepData(step.data) : ''}
     `;
+    container.appendChild(header);
     
-    return stepDiv;
+    // Create controls
+    const controls = document.createElement('div');
+    controls.className = 'visualization-controls';
+    controls.innerHTML = `
+        <button id="prev-step" class="control-btn">⏮ 上一步</button>
+        <button id="auto-play" class="control-btn">▶ 自动播放</button>
+        <button id="next-step" class="control-btn">下一步 ⏭</button>
+        <button id="reset-visualization" class="control-btn">🔄 重置</button>
+        <div class="speed-control">
+            <label>速度:</label>
+            <select id="play-speed">
+                <option value="2000">慢</option>
+                <option value="1000" selected>正常</option>
+                <option value="500">快</option>
+            </select>
+        </div>
+    `;
+    container.appendChild(controls);
+    
+    // Create step display area
+    const stepDisplay = document.createElement('div');
+    stepDisplay.id = 'step-display';
+    stepDisplay.className = 'step-display';
+    container.appendChild(stepDisplay);
+    
+    // Re-setup event listeners for new buttons
+    setupVisualizationControls();
+    
+    // Store state for visualization
+    window.visualizationState = state;
+    currentVisualizationStep = 0;
 }
 
-function createStepData(data) {
-    let html = '<div class="step-data">';
+function updateVisualizationStep(stepIndex) {
+    const state = window.visualizationState;
+    if (!state || !state.rounds) return;
     
-    for (const [key, value] of Object.entries(data)) {
-        if (value !== undefined && value !== null) {
-            html += `
-                <div class="data-item">
-                    <span class="data-label">${key}:</span>
-                    <span class="data-value">${formatDataValue(value)}</span>
+    const round = state.rounds[stepIndex];
+    if (!round) return;
+    
+    currentVisualizationStep = stepIndex;
+    
+    // Update progress
+    const progressFill = document.getElementById('progress-fill');
+    if (progressFill) {
+        const progress = ((stepIndex + 1) / state.rounds.length) * 100;
+        progressFill.style.width = `${progress}%`;
+    }
+    
+    // Update step display
+    const stepDisplay = document.getElementById('step-display');
+    if (stepDisplay) {
+        stepDisplay.innerHTML = createRoundVisualization(round, stepIndex + 1);
+    }
+    
+    // Update controls
+    updateVisualizationControls();
+}
+
+function createRoundVisualization(round, roundNumber) {
+    return `
+        <div class="round-visualization">
+            <div class="round-header">
+                <h4>第 ${roundNumber} 轮加密</h4>
+                <span class="round-description">${round.description}</span>
+            </div>
+            
+            <div class="round-content">
+                <div class="input-state">
+                    <h5>输入状态</h5>
+                    <div class="state-words">
+                        ${round.input.map((word, i) => 
+                            `<div class="word-box">
+                                <label>X${i}</label>
+                                <div class="hex-value">${word.toString(16).padStart(8, '0')}</div>
+                            </div>`
+                        ).join('')}
+                    </div>
                 </div>
-            `;
-        }
-    }
-    
-    html += '</div>';
-    return html;
+                
+                <div class="transformation">
+                    <h5>轮密钥与变换</h5>
+                    <div class="transform-steps">
+                        <div class="round-key">
+                            <label>轮密钥 RK${roundNumber - 1}</label>
+                            <div class="hex-value key-value">${round.roundKey.toString(16).padStart(8, '0')}</div>
+                        </div>
+                        <div class="sbox-output">
+                            <label>S盒输出</label>
+                            <div class="hex-value sbox-value">${round.sboxOutput.toString(16).padStart(8, '0')}</div>
+                        </div>
+                        <div class="linear-output">
+                            <label>线性变换输出</label>
+                            <div class="hex-value linear-value">${round.linearOutput.toString(16).padStart(8, '0')}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="output-state">
+                    <h5>输出状态</h5>
+                    <div class="state-words">
+                        ${round.output.map((word, i) => 
+                            `<div class="word-box output">
+                                <label>X${i}</label>
+                                <div class="hex-value">${word.toString(16).padStart(8, '0')}</div>
+                            </div>`
+                        ).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
-function formatDataValue(value) {
-    if (Array.isArray(value)) {
-        return bytesToHex(value);
+function updateVisualizationControls() {
+    const state = window.visualizationState;
+    if (!state) return;
+    
+    const prevBtn = document.getElementById('prev-step');
+    const nextBtn = document.getElementById('next-step');
+    const autoPlayBtn = document.getElementById('auto-play');
+    
+    if (prevBtn) {
+        prevBtn.disabled = currentVisualizationStep === 0;
     }
-    if (typeof value === 'object') {
-        return JSON.stringify(value);
+    
+    if (nextBtn) {
+        nextBtn.disabled = currentVisualizationStep >= state.rounds.length - 1;
     }
-    return String(value);
+    
+    if (autoPlayBtn) {
+        autoPlayBtn.textContent = isAutoPlay ? '⏸ 暂停' : '▶ 自动播放';
+        autoPlayBtn.disabled = currentVisualizationStep >= state.rounds.length - 1;
+    }
+}
+
+function previousStep() {
+    if (currentVisualizationStep > 0) {
+        updateVisualizationStep(currentVisualizationStep - 1);
+    }
+}
+
+function nextStep() {
+    const state = window.visualizationState;
+    if (state && currentVisualizationStep < state.rounds.length - 1) {
+        updateVisualizationStep(currentVisualizationStep + 1);
+    }
+}
+
+function toggleAutoPlay() {
+    isAutoPlay = !isAutoPlay;
+    updateVisualizationControls();
+    
+    if (isAutoPlay) {
+        autoPlayVisualization();
+    }
+}
+
+function autoPlayVisualization() {
+    if (!isAutoPlay) return;
+    
+    const state = window.visualizationState;
+    if (!state || currentVisualizationStep >= state.rounds.length - 1) {
+        isAutoPlay = false;
+        updateVisualizationControls();
+        return;
+    }
+    
+    const speedSelect = document.getElementById('play-speed');
+    const speed = speedSelect ? parseInt(speedSelect.value) : 1000;
+    
+    setTimeout(() => {
+        nextStep();
+        if (isAutoPlay) {
+            autoPlayVisualization();
+        }
+    }, speed);
+}
+
+function resetVisualization() {
+    currentVisualizationStep = 0;
+    isAutoPlay = false;
+    updateVisualizationStep(0);
 }
 
 // Utility functions
@@ -343,8 +526,12 @@ function copyResult() {
 function clearResults() {
     elements.outputText.value = '';
     elements.stats.style.display = 'none';
-    elements.stepsContainer.innerHTML = '<p class="placeholder">执行算法后，这里将显示详细的步骤可视化</p>';
+    if (elements.stepsContainer) {
+        elements.stepsContainer.innerHTML = '<p class="placeholder">执行算法后，这里将显示详细的步骤可视化</p>';
+    }
     processingResults = null;
+    currentVisualizationStep = 0;
+    isAutoPlay = false;
 }
 
 function showLoading() {
