@@ -5,194 +5,316 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SM4 密码算法可视化工具</title>
-    <meta name="description" content="SM4对称加密算法可视化演示工具">
+    <meta name="description" content="完整的SM4国密算法可视化工具，支持ECB和CBC模式，包含算法步骤可视化">
+    <meta name="keywords" content="SM4,国密算法,加密,解密,可视化,教育工具">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,">
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/components.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo-section">
-                    <div class="logo-icon">🔐</div>
-                    <div class="logo-text">
-                        <h1>SM4 密码算法可视化工具</h1>
-                        <p>交互式 SM4 算法学习工具</p>
-                    </div>
-                </div>
-                
-                <nav class="nav">
-                    <button class="nav-btn active" data-view="description">📖 项目介绍</button>
-                    <button class="nav-btn" data-view="visualizer">🔑 可视化工具</button>
-                </nav>
-            </div>
+    <div id="app">
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-spinner"></div>
+            <p>加载中...</p>
         </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="main">
-        <div class="container">
-            <!-- Project Description View -->
-            <div id="description-view" class="view active">
-                <div class="description-content">
-                    <h2>SM4 密码算法可视化工具</h2>
-                    <p>这是一个基于纯 HTML、CSS 和 JavaScript 构建的 SM4 对称加密算法可视化演示工具，支持完整的加密和解密过程，并提供详细的算法步骤可视化。</p>
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <h1>SM4 密码算法可视化工具</h1>
+                        <span class="version">v2.0</span>
+                    </div>
                     
-                    <div class="features">
-                        <h3>功能特性</h3>
-                        <ul>
-                            <li>🔐 <strong>完整的SM4算法实现</strong> - 支持ECB和CBC模式</li>
-                            <li>🔄 <strong>加密和解密功能</strong> - 可视化完整的双向过程</li>
-                            <li>📊 <strong>详细的算法可视化</strong> - 轮函数、S盒变换、线性变换等</li>
-                            <li>🛠️ <strong>多种配置选项</strong> - PKCS7/无填充、UTF8/ASCII编码、十六进制/Base64输出</li>
-                            <li>🎯 <strong>实时性能分析</strong> - 执行时间、吞吐量等指标</li>
-                            <li>📚 <strong>内置教程系统</strong> - 详细的算法原理说明</li>
-                            <li>🎨 <strong>现代化UI界面</strong> - 响应式设计，支持移动设备</li>
-                        </ul>
-                    </div>
-
-                    <div class="technology">
-                        <h3>技术栈</h3>
-                        <ul>
-                            <li><strong>前端技术</strong>: HTML5 + CSS3 + JavaScript (ES6+)</li>
-                            <li><strong>样式设计</strong>: CSS Grid + Flexbox + CSS Variables</li>
-                            <li><strong>算法实现</strong>: 纯JavaScript实现SM4国密算法</li>
-                            <li><strong>数据处理</strong>: 原生JavaScript处理各种格式转换</li>
-                            <li><strong>响应式设计</strong>: CSS媒体查询实现多设备适配</li>
-                        </ul>
-                    </div>
+                    <!-- Navigation -->
+                    <nav class="nav">
+                        <button class="nav-btn active" data-view="encrypt">
+                            <span class="nav-icon">🔐</span>
+                            <span>加密解密</span>
+                        </button>
+                        <button class="nav-btn" data-view="visualization">
+                            <span class="nav-icon">👁️</span>
+                            <span>算法可视化</span>
+                        </button>
+                        <button class="nav-btn" data-view="tutorial">
+                            <span class="nav-icon">📚</span>
+                            <span>教程说明</span>
+                        </button>
+                    </nav>
                 </div>
             </div>
+        </header>
 
-            <!-- Visualizer View -->
-            <div id="visualizer-view" class="view">
-                <div class="visualizer-grid">
-                    <!-- Configuration Panel -->
-                    <div class="panel config-panel">
-                        <h3>配置选项</h3>
-                        <div class="form-group">
-                            <label>操作模式</label>
-                            <div class="radio-group">
-                                <label><input type="radio" name="operation" value="encrypt" checked> 加密</label>
-                                <label><input type="radio" name="operation" value="decrypt"> 解密</label>
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Encrypt/Decrypt View -->
+            <div id="encrypt-view" class="view active">
+                <div class="container">
+                    <div class="view-grid">
+                        <!-- Configuration Panel -->
+                        <div class="panel config-panel">
+                            <div class="panel-header">
+                                <h2>配置设置</h2>
+                                <div class="panel-icon">⚙️</div>
+                            </div>
+                            <div class="panel-content">
+                                <!-- Operation Selection -->
+                                <div class="form-group">
+                                    <label class="form-label">操作模式</label>
+                                    <div class="radio-group">
+                                        <label class="radio-item">
+                                            <input type="radio" name="operation" value="encrypt" checked>
+                                            <span class="radio-mark"></span>
+                                            <span>加密 (Encrypt)</span>
+                                        </label>
+                                        <label class="radio-item">
+                                            <input type="radio" name="operation" value="decrypt">
+                                            <span class="radio-mark"></span>
+                                            <span>解密 (Decrypt)</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Mode Selection -->
+                                <div class="form-group">
+                                    <label for="mode-select" class="form-label">工作模式</label>
+                                    <select id="mode-select" class="form-select">
+                                        <option value="ECB">ECB (电子密码本模式)</option>
+                                        <option value="CBC">CBC (密码分组链接模式)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Padding Selection -->
+                                <div class="form-group">
+                                    <label for="padding-select" class="form-label">填充方式</label>
+                                    <select id="padding-select" class="form-select">
+                                        <option value="PKCS7">PKCS7 填充</option>
+                                        <option value="NoPadding">无填充</option>
+                                    </select>
+                                </div>
+
+                                <!-- Encoding Selection -->
+                                <div class="form-group">
+                                    <label for="encoding-select" class="form-label">输入编码</label>
+                                    <select id="encoding-select" class="form-select">
+                                        <option value="utf8">UTF-8</option>
+                                        <option value="hex">十六进制</option>
+                                        <option value="base64">Base64</option>
+                                    </select>
+                                </div>
+
+                                <!-- Output Format -->
+                                <div class="form-group">
+                                    <label for="output-format-select" class="form-label">输出格式</label>
+                                    <select id="output-format-select" class="form-select">
+                                        <option value="hex">十六进制</option>
+                                        <option value="base64">Base64</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label>分组模式</label>
-                            <select id="mode-select">
-                                <option value="ECB">ECB (电子密码本)</option>
-                                <option value="CBC">CBC (密码分组链接)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>填充方案</label>
-                            <select id="padding-select">
-                                <option value="PKCS7">PKCS7</option>
-                                <option value="None">无填充</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>输入编码</label>
-                            <select id="encoding-select">
-                                <option value="utf8">UTF-8</option>
-                                <option value="ascii">ASCII</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>输出格式</label>
-                            <select id="output-format-select">
-                                <option value="hex">十六进制</option>
-                                <option value="base64">Base64</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <!-- Input Panel -->
-                    <div class="panel input-panel">
-                        <h3>输入数据</h3>
-                        <div class="form-group">
-                            <label for="input-text">明文/密文</label>
-                            <textarea id="input-text" placeholder="请输入要处理的文本..."></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="key-input">密钥 (32位十六进制)</label>
-                            <input type="text" id="key-input" placeholder="例如: 0123456789abcdeffedcba9876543210">
-                            <button class="btn-secondary" id="generate-key">生成随机密钥</button>
-                        </div>
-                        
-                        <div class="form-group iv-group" style="display: none;">
-                            <label for="iv-input">初始向量 (32位十六进制)</label>
-                            <input type="text" id="iv-input" placeholder="例如: 0123456789abcdeffedcba9876543210">
-                            <button class="btn-secondary" id="generate-iv">生成随机IV</button>
-                        </div>
-                        
-                        <button class="btn-primary" id="process-btn">开始加密</button>
-                    </div>
-
-                    <!-- Output Panel -->
-                    <div class="panel output-panel">
-                        <h3>输出结果</h3>
-                        <div class="result-area">
-                            <div class="form-group">
-                                <label>处理结果</label>
-                                <textarea id="output-text" readonly placeholder="结果将在这里显示..."></textarea>
-                                <button class="btn-secondary" id="copy-result">复制结果</button>
+                        <!-- Input Panel -->
+                        <div class="panel input-panel">
+                            <div class="panel-header">
+                                <h2>输入数据</h2>
+                                <div class="panel-icon">📝</div>
                             </div>
-                            
-                            <div class="stats" id="stats" style="display: none;">
-                                <h4>性能统计</h4>
-                                <div class="stats-grid">
+                            <div class="panel-content">
+                                <!-- Input Text -->
+                                <div class="form-group">
+                                    <label for="input-text" class="form-label">明文</label>
+                                    <textarea 
+                                        id="input-text" 
+                                        class="form-textarea" 
+                                        placeholder="请输入要加密的文本..."
+                                        rows="4"
+                                    ></textarea>
+                                </div>
+
+                                <!-- Key Input -->
+                                <div class="form-group">
+                                    <label for="key-input" class="form-label">
+                                        密钥 (128位/32个十六进制字符)
+                                        <button id="generate-key" class="generate-btn" title="生成随机密钥">🎲</button>
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="key-input" 
+                                        class="form-input font-mono" 
+                                        placeholder="0123456789abcdeffedcba9876543210"
+                                        maxlength="32"
+                                    >
+                                </div>
+
+                                <!-- IV Input (for CBC mode) -->
+                                <div class="form-group iv-group" style="display: none;">
+                                    <label for="iv-input" class="form-label">
+                                        初始向量 IV (128位/32个十六进制字符)
+                                        <button id="generate-iv" class="generate-btn" title="生成随机IV">🎲</button>
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="iv-input" 
+                                        class="form-input font-mono" 
+                                        placeholder="0123456789abcdeffedcba9876543210"
+                                        maxlength="32"
+                                    >
+                                </div>
+
+                                <!-- Process Button -->
+                                <button id="process-btn" class="btn btn-primary btn-large" disabled>
+                                    开始加密
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Output Panel -->
+                        <div class="panel output-panel">
+                            <div class="panel-header">
+                                <h2>输出结果</h2>
+                                <div class="panel-icon">📤</div>
+                            </div>
+                            <div class="panel-content">
+                                <!-- Output Text -->
+                                <div class="form-group">
+                                    <label for="output-text" class="form-label">
+                                        输出结果
+                                        <button id="copy-result" class="copy-btn" title="复制结果">📋</button>
+                                    </label>
+                                    <textarea 
+                                        id="output-text" 
+                                        class="form-textarea font-mono" 
+                                        placeholder="处理结果将在这里显示..."
+                                        readonly
+                                        rows="4"
+                                    ></textarea>
+                                </div>
+
+                                <!-- Stats -->
+                                <div id="stats" class="stats" style="display: none;">
                                     <div class="stat-item">
-                                        <span class="stat-label">执行时间</span>
-                                        <span class="stat-value" id="execution-time">-</span>
+                                        <span class="stat-label">执行时间:</span>
+                                        <span id="execution-time" class="stat-value">-</span>
                                     </div>
                                     <div class="stat-item">
-                                        <span class="stat-label">数据长度</span>
-                                        <span class="stat-value" id="data-length">-</span>
+                                        <span class="stat-label">数据长度:</span>
+                                        <span id="data-length" class="stat-value">-</span>
                                     </div>
                                     <div class="stat-item">
-                                        <span class="stat-label">分组数量</span>
-                                        <span class="stat-value" id="block-count">-</span>
+                                        <span class="stat-label">分组数量:</span>
+                                        <span id="block-count" class="stat-value">-</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <!-- Visualization Panel -->
+            <!-- Visualization View -->
+            <div id="visualization-view" class="view">
+                <div class="container">
                     <div class="panel visualization-panel">
-                        <h3>算法可视化</h3>
-                        <div class="visualization-content">
-                            <div class="steps-container" id="steps-container">
+                        <div class="panel-header">
+                            <h2>SM4 算法可视化</h2>
+                            <div class="panel-icon">🔍</div>
+                        </div>
+                        <div class="panel-content">
+                            <!-- Visualization Container -->
+                            <div id="steps-container" class="steps-container">
                                 <p class="placeholder">执行算法后，这里将显示详细的步骤可视化</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>⚡ SM4 密码算法可视化工具 - 理解加密算法的教育工具</p>
-        </div>
-    </footer>
+            <!-- Tutorial View -->
+            <div id="tutorial-view" class="view">
+                <div class="container">
+                    <div class="panel tutorial-panel">
+                        <div class="panel-header">
+                            <h2>SM4 算法教程</h2>
+                            <div class="panel-icon">📖</div>
+                        </div>
+                        <div class="panel-content">
+                            <!-- Tutorial content will be loaded here -->
+                            <div class="tutorial-content">
+                                <section class="tutorial-section">
+                                    <h3>什么是SM4算法？</h3>
+                                    <p>SM4是中华人民共和国政府采用的一种分组密码标准，由国家密码管理局于2012年3月21日发布。</p>
+                                    <ul>
+                                        <li>分组长度：128位</li>
+                                        <li>密钥长度：128位</li>
+                                        <li>轮数：32轮</li>
+                                        <li>结构：非平衡Feistel结构</li>
+                                    </ul>
+                                </section>
 
-    <!-- Scripts -->
+                                <section class="tutorial-section">
+                                    <h3>工作模式</h3>
+                                    <div class="mode-comparison">
+                                        <div class="mode-item">
+                                            <h4>ECB模式 (电子密码本)</h4>
+                                            <p>最简单的加密模式，每个明文分组独立加密。</p>
+                                            <p><strong>优点：</strong>简单、可并行处理</p>
+                                            <p><strong>缺点：</strong>相同明文产生相同密文，安全性较低</p>
+                                        </div>
+                                        <div class="mode-item">
+                                            <h4>CBC模式 (密码分组链接)</h4>
+                                            <p>每个明文分组与前一个密文分组异或后再加密。</p>
+                                            <p><strong>优点：</strong>相同明文产生不同密文，安全性较高</p>
+                                            <p><strong>缺点：</strong>无法并行加密，需要初始向量</p>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section class="tutorial-section">
+                                    <h3>使用说明</h3>
+                                    <ol>
+                                        <li>选择操作模式（加密/解密）</li>
+                                        <li>配置工作模式和填充方式</li>
+                                        <li>输入明文/密文和密钥</li>
+                                        <li>CBC模式需要提供初始向量</li>
+                                        <li>点击执行按钮开始处理</li>
+                                        <li>查看结果和可视化过程</li>
+                                    </ol>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 SM4 密码算法可视化工具 - 仅供学习和研究使用</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Required Lovable script tag for new features -->
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    
+    <!-- Application Scripts -->
     <script src="js/utils/formatConverter.js"></script>
     <script src="js/utils/paddingUtils.js"></script>
     <script src="js/sm4/sm4Constants.js"></script>
     <script src="js/sm4/sm4Core.js"></script>
-    <script src="js/sm4/sm4Encrypt.js"></script>
-    <script src="js/sm4/sm4Decrypt.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
