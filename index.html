@@ -1,26 +1,198 @@
+
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sm4-cipher-visualizer-plus</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SM4 密码算法可视化工具</title>
+    <meta name="description" content="SM4对称加密算法可视化演示工具">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-icon">🔐</div>
+                    <div class="logo-text">
+                        <h1>SM4 密码算法可视化工具</h1>
+                        <p>交互式 SM4 算法学习工具</p>
+                    </div>
+                </div>
+                
+                <nav class="nav">
+                    <button class="nav-btn active" data-view="description">📖 项目介绍</button>
+                    <button class="nav-btn" data-view="visualizer">🔑 可视化工具</button>
+                </nav>
+            </div>
+        </div>
+    </header>
 
-    <meta property="og:title" content="sm4-cipher-visualizer-plus" />
-    <meta property="og:description" content="Lovable Generated Project" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Project Description View -->
+            <div id="description-view" class="view active">
+                <div class="description-content">
+                    <h2>SM4 密码算法可视化工具</h2>
+                    <p>这是一个基于纯 HTML、CSS 和 JavaScript 构建的 SM4 对称加密算法可视化演示工具，支持完整的加密和解密过程，并提供详细的算法步骤可视化。</p>
+                    
+                    <div class="features">
+                        <h3>功能特性</h3>
+                        <ul>
+                            <li>🔐 <strong>完整的SM4算法实现</strong> - 支持ECB和CBC模式</li>
+                            <li>🔄 <strong>加密和解密功能</strong> - 可视化完整的双向过程</li>
+                            <li>📊 <strong>详细的算法可视化</strong> - 轮函数、S盒变换、线性变换等</li>
+                            <li>🛠️ <strong>多种配置选项</strong> - PKCS7/无填充、UTF8/ASCII编码、十六进制/Base64输出</li>
+                            <li>🎯 <strong>实时性能分析</strong> - 执行时间、吞吐量等指标</li>
+                            <li>📚 <strong>内置教程系统</strong> - 详细的算法原理说明</li>
+                            <li>🎨 <strong>现代化UI界面</strong> - 响应式设计，支持移动设备</li>
+                        </ul>
+                    </div>
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-  </head>
+                    <div class="technology">
+                        <h3>技术栈</h3>
+                        <ul>
+                            <li><strong>前端技术</strong>: HTML5 + CSS3 + JavaScript (ES6+)</li>
+                            <li><strong>样式设计</strong>: CSS Grid + Flexbox + CSS Variables</li>
+                            <li><strong>算法实现</strong>: 纯JavaScript实现SM4国密算法</li>
+                            <li><strong>数据处理</strong>: 原生JavaScript处理各种格式转换</li>
+                            <li><strong>响应式设计</strong>: CSS媒体查询实现多设备适配</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-  <body>
-    <div id="root"></div>
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+            <!-- Visualizer View -->
+            <div id="visualizer-view" class="view">
+                <div class="visualizer-grid">
+                    <!-- Configuration Panel -->
+                    <div class="panel config-panel">
+                        <h3>配置选项</h3>
+                        <div class="form-group">
+                            <label>操作模式</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="operation" value="encrypt" checked> 加密</label>
+                                <label><input type="radio" name="operation" value="decrypt"> 解密</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>分组模式</label>
+                            <select id="mode-select">
+                                <option value="ECB">ECB (电子密码本)</option>
+                                <option value="CBC">CBC (密码分组链接)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>填充方案</label>
+                            <select id="padding-select">
+                                <option value="PKCS7">PKCS7</option>
+                                <option value="None">无填充</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>输入编码</label>
+                            <select id="encoding-select">
+                                <option value="utf8">UTF-8</option>
+                                <option value="ascii">ASCII</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>输出格式</label>
+                            <select id="output-format-select">
+                                <option value="hex">十六进制</option>
+                                <option value="base64">Base64</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Input Panel -->
+                    <div class="panel input-panel">
+                        <h3>输入数据</h3>
+                        <div class="form-group">
+                            <label for="input-text">明文/密文</label>
+                            <textarea id="input-text" placeholder="请输入要处理的文本..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="key-input">密钥 (32位十六进制)</label>
+                            <input type="text" id="key-input" placeholder="例如: 0123456789abcdeffedcba9876543210">
+                            <button class="btn-secondary" id="generate-key">生成随机密钥</button>
+                        </div>
+                        
+                        <div class="form-group iv-group" style="display: none;">
+                            <label for="iv-input">初始向量 (32位十六进制)</label>
+                            <input type="text" id="iv-input" placeholder="例如: 0123456789abcdeffedcba9876543210">
+                            <button class="btn-secondary" id="generate-iv">生成随机IV</button>
+                        </div>
+                        
+                        <button class="btn-primary" id="process-btn">开始加密</button>
+                    </div>
+
+                    <!-- Output Panel -->
+                    <div class="panel output-panel">
+                        <h3>输出结果</h3>
+                        <div class="result-area">
+                            <div class="form-group">
+                                <label>处理结果</label>
+                                <textarea id="output-text" readonly placeholder="结果将在这里显示..."></textarea>
+                                <button class="btn-secondary" id="copy-result">复制结果</button>
+                            </div>
+                            
+                            <div class="stats" id="stats" style="display: none;">
+                                <h4>性能统计</h4>
+                                <div class="stats-grid">
+                                    <div class="stat-item">
+                                        <span class="stat-label">执行时间</span>
+                                        <span class="stat-value" id="execution-time">-</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">数据长度</span>
+                                        <span class="stat-value" id="data-length">-</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">分组数量</span>
+                                        <span class="stat-value" id="block-count">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visualization Panel -->
+                    <div class="panel visualization-panel">
+                        <h3>算法可视化</h3>
+                        <div class="visualization-content">
+                            <div class="steps-container" id="steps-container">
+                                <p class="placeholder">执行算法后，这里将显示详细的步骤可视化</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>⚡ SM4 密码算法可视化工具 - 理解加密算法的教育工具</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/utils/formatConverter.js"></script>
+    <script src="js/utils/paddingUtils.js"></script>
+    <script src="js/sm4/sm4Constants.js"></script>
+    <script src="js/sm4/sm4Core.js"></script>
+    <script src="js/sm4/sm4Encrypt.js"></script>
+    <script src="js/sm4/sm4Decrypt.js"></script>
+    <script src="js/main.js"></script>
+</body>
 </html>
